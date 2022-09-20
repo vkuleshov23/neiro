@@ -1,8 +1,6 @@
 package ai.ml.service;
 
-import ai.ml.util.SizeConsts;
 import javafx.scene.image.*;
-import javafx.scene.paint.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

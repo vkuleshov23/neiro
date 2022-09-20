@@ -4,16 +4,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class WritingPixels {
 
     private PixelWriter pixelWriter;
+    private static final int pixelSize = 12;
     private int xPos, yPos;
-
-    private int pixelSize = 12;
-
     private int xSize, ySize;
 
     public PixelWriter setCanvas(Canvas  canvas) {
@@ -35,7 +33,7 @@ public class WritingPixels {
 
     public void clear(){
         for (int x = 0; x < xSize; x++) {
-            for (int y = 0; y < xSize; y++) {
+            for (int y = 0; y < ySize; y++) {
                 pixelWriter.setColor(x, y, Color.WHITE);
             }
         }

@@ -9,11 +9,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import lombok.RequiredArgsConstructor;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 
 
-@Component
 @FxmlView
+@Controller
 @RequiredArgsConstructor
 public class MainSceneController {
 
@@ -24,6 +26,8 @@ public class MainSceneController {
     private final WritingPixels writingPixels;
     private final ImageService imageService;
 
+    Logger logger = LoggerFactory.getLogger(MainSceneController.class);
+
     @FXML
     public void initialize() {
         writingPixels.setCanvas(canvas);
@@ -31,16 +35,15 @@ public class MainSceneController {
     }
 
     public void clear(ActionEvent event) {
-        System.out.println("CLEAR");
         writingPixels.clear();
-
+        logger.debug("CLEARED");
     }
 
     public void save(ActionEvent actionEvent) {
         imageService.setSymbol(symbol.getText());
         imageService.saveImage(canvas.snapshot(null, null));
-        System.out.println("saved");
         writingPixels.clear();
+        logger.debug("SAVED");
     }
 
     public void onMouseDragged(MouseEvent mouseEvent) {

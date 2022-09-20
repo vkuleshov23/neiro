@@ -1,37 +1,46 @@
 package ai.ml.service;
 
-import ai.ml.AiMlApplication;
-import ai.ml.model.PerceptronNumber;
-import ai.ml.model.PerceptronPixel;
-import ai.ml.util.SizeConsts;
+import ai.ml.model.Perceptron;
+import ai.ml.model.PerceptronSymbol;
+import ai.ml.util.NewNeiroCreator;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Service
+@Getter
+@Setter
 @RequiredArgsConstructor
-public class Neiro {
+public class Neiro implements Serializable {
 
+    private final Logger logger = LoggerFactory.getLogger(Neiro.class);
 
-    Logger logger = LoggerFactory.getLogger(AiMlApplication.class);
+    private List<Perceptron> perceptrons = new ArrayList<>();
 
-    List<PerceptronNumber> symbols = new ArrayList<>(SizeConsts.symbolsCount);
-    List<PerceptronPixel> pixels = new ArrayList<>(SizeConsts.xSize * SizeConsts.ySize);
+    public void createNewPerceptrones() {
+        this.perceptrons = NewNeiroCreator.createPerceptrons();
+    }
 
-    private void createLists() {
-        for (Integer i = 0; i < SizeConsts.symbolsCount; i++) {
-            symbols.add(new PerceptronNumber(i.toString()));
-        }
-        for (Integer x = 0; x < SizeConsts.xSize; x++) {
-            for (Integer y = 0; y < SizeConsts.ySize; y++) {
-                pixels.add(new PerceptronPixel(x, y));
-            }
-        }
+    public Perceptron findBySymbol(PerceptronSymbol perceptronSymbol) throws Exception {
+        return perceptrons.stream()
+                .filter( perceptron -> perceptron.equalsBySymbol(perceptronSymbol))
+                .findAny().orElseThrow(() -> new Exception("No such perceptron exist!"));
+    }
+
+//    @PostConstruct
+    public void print() {
+//        createNewPerceptrones();
+        perceptrons.forEach(System.out::println);
     }
 
 }

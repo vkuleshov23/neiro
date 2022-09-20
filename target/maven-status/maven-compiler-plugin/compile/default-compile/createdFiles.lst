@@ -1,9 +1,12 @@
 ai\ml\service\ImageService.class
-ai\ml\util\SizeConsts.class
+ai\ml\service\DataSetReader.class
 ai\ml\service\FileController.class
-ai\ml\model\PerceptronNumber.class
+ai\ml\util\NewNeiroCreator.class
+ai\ml\util\WriteSaveProgress.class
+ai\ml\model\PerceptronSymbol.class
 ai\ml\model\Perceptron.class
 ai\ml\model\PerceptronPixel.class
+ai\ml\util\Consts.class
 ai\ml\service\Neiro.class
 ai\ml\service\WritingPixels.class
 ai\ml\AiMlApplication.class
