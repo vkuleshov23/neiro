@@ -15,7 +15,7 @@
             <children>
                 <ScrollPane layoutX="41.0" layoutY="37.0" prefHeight="200.0" prefWidth="200.0">
                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                        <TextArea fx:id="resPane" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
                     </content>
                 </ScrollPane>
                 <Button layoutX="104.0" layoutY="299.0" mnemonicParsing="false" onAction="#save"  text="Сохранить" />
@@ -24,9 +24,9 @@
         </Pane>
         <Pane layoutY="318.0" prefHeight="83.0" prefWidth="320.0">
             <children>
-                <Button layoutX="127.0" layoutY="29.0" mnemonicParsing="false" text="Наказать" textFill="#9e2d2d" />
+                <Button onAction="#punish" layoutX="127.0" layoutY="29.0" mnemonicParsing="false" text="Наказать" textFill="#9e2d2d" />
                 <Button onAction="#clear" layoutX="240.0" layoutY="29.0" mnemonicParsing="false" text="Очистить" textFill="#231b6b" />
-                <Button layoutX="14.0" layoutY="29.0" mnemonicParsing="false" text="Похвалить" textFill="#338368" />
+                <Button onAction="#recognize" layoutX="14.0" layoutY="29.0" mnemonicParsing="false" text="Распознать" textFill="#338368" />
             </children>
         </Pane>
     </children>

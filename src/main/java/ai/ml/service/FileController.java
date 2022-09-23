@@ -4,6 +4,8 @@ import ai.ml.util.Consts;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.*;
 import javafx.scene.paint.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -14,28 +16,29 @@ import java.util.Objects;
 @Service
 public class FileController {
 
+    Logger logger = LoggerFactory.getLogger(FileController.class);
+
     private static final String fileSystemDelimiter = "\\";
 
-    private static final String neiroFile = "E:\\AI\\neiro.ser";
+    private static final String basicWay = "E:\\AI\\";
 
-    private static final String way = "E:\\AI\\DataSet\\";
+    private static final String neiroFile = basicWay + "neiro.ser";
+
+    private static final String way = basicWay + "DataSet\\";
+    private static final String cache = basicWay + "Cache\\";
 
 
     public void saveNeiro(Neiro neiro) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(neiroFile));) {
             oos.writeObject(neiro);
         } catch (IOException e) {
-           System.out.println(e.getMessage());
+           logger.error(e.getMessage());
         }
     }
 
-    public Neiro loadNeiro() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(neiroFile));) {
-            return (Neiro) ois.readObject();
-        } catch (Exception e) {
-            System.out.println("neiro -> " + e.getMessage());
-        }
-        return new Neiro();
+    public Neiro loadNeiro() throws Exception {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(neiroFile));
+        return (Neiro) ois.readObject();
     }
 
 
@@ -50,14 +53,8 @@ public class FileController {
         throw new Exception("Can't create directory");
     }
 
-//    public void loadImages(String symbol) {
-//        BufferedImage
-//    }
-
-    public void saveImage(Image image, String ... fileWaySlices) {
+    public Image save(File file, Image image) throws Exception {
         try {
-            String fileWay = toOneWay(fileWaySlices);
-            File file = new File(way + fileWay + filesCount(fileWay) + ".png");
             BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
             bufferedImage = trim(bufferedImage);
             ImageIO.write(bufferedImage, "png", file);
@@ -65,11 +62,24 @@ public class FileController {
             Image readeImage = toPerceptronResolution(SwingFXUtils.toFXImage(readBufferedImage, null));
             readBufferedImage = SwingFXUtils.fromFXImage(readeImage, null);
             ImageIO.write(readBufferedImage, "png", file);
+            return readeImage;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
+            throw ex;
         }
     }
+
+    public Image prepareImageFoNeiro(Image image) throws Exception {
+        File file = new File(cache + "cache.png");
+        return save(file, image);
+    }
+
+    public Image saveImage(Image image, String ... fileWaySlices) throws Exception {
+        String fileWay = toOneWay(fileWaySlices);
+        File file = new File(way + fileWay + filesCount(fileWay) + ".png");
+        return save(file, image);
+    }
+
 
     private String toOneWay(String ... fileWay) {
         StringBuilder oneWay = new StringBuilder();
@@ -108,13 +118,9 @@ public class FileController {
 
     private BufferedImage trim(BufferedImage img) {
         int top = getTopInset(img);
-        System.out.println("top = " + top);
         int bottom = getBottomInset(img);
-        System.out.println("bottom = " + bottom);
         int left = getLeftInset(img);
-        System.out.println("left = " + left);
         int right = getRightInset(img);
-        System.out.println("right = " + right);
         return img.getSubimage(left, top, right-left, bottom-top);
     }
 
