@@ -96,4 +96,8 @@ public class MainSceneController {
     public void onMouseDragged(MouseEvent mouseEvent) {
         writingPixels.printPixel(mouseEvent);
     }
+
+    public void learn(ActionEvent actionEvent) {
+        imageService.learForSymbols(this.neiro);
+    }
 }

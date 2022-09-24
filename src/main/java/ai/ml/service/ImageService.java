@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+
 @Service
 @RequiredArgsConstructor
 public class ImageService {
@@ -26,6 +28,35 @@ public class ImageService {
         this.fileController.saveImage(image, symbol);
     }
 
+    public void learForSymbols(Neiro neiro) {
+        for (String patternSymbol : Consts.symbols) {
+            logger.debug("symbol: {}", patternSymbol);
+            learForSymbol(neiro, patternSymbol);
+        }
+    }
+
+    private void learForSymbol(Neiro neiro, String patternSymbol) {
+        try {
+            String[] imageNames = fileController.getFileNames(patternSymbol);
+            for (String imageName : imageNames) {
+                this.learForImage(neiro, imageName, patternSymbol);
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
+    }
+
+    private void learForImage(Neiro neiro, String imageName, String patternSymbol) {
+        logger.debug("image -> {}", imageName);
+        try {
+            Image image = fileController.loadImage(new File(imageName));
+            int[][] bitMap = this.imageForNeiro(image);
+            neiro.learn(bitMap, getPixelSum(bitMap), patternSymbol);
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
+    }
+
     public double getPixelSum(int[][] bitMapImage) {
         double sum = 0.0;
         for (int x = 0; x < bitMapImage.length; x++) {
@@ -35,7 +66,6 @@ public class ImageService {
         }
         return sum;
     }
-
 
     public int[][] imageForNeiro(Image image) throws Exception {
         image = this.fileController.prepareImageFoNeiro(image);

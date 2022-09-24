@@ -1,6 +1,7 @@
 package ai.ml.service;
 
 import ai.ml.model.Perceptron;
+import ai.ml.util.Consts;
 import ai.ml.util.NewNeiroCreator;
 import javafx.util.Pair;
 import lombok.Getter;
@@ -41,6 +42,17 @@ public class Neiro implements Serializable {
                 .filter(p -> !p.equalsBySymbol(symbol)).toList();
     }
 
+    public void learn(int[][] bitMap, double referenceSum, String symbol) throws Exception {
+        Pair<String, Double> predict = getPredicts(bitMap, referenceSum).stream()
+                .findFirst().orElseThrow(() -> new Exception("Predicts is empty!"));
+        logger.info("perceptron -> {} | symbol -> {}", predict.getKey(), symbol);
+        if (!predict.getKey().equals(symbol)) {
+            punish(bitMap, symbol);
+        } else if (predict.getValue() < Consts.threshold) {
+            punish(bitMap, symbol);
+        }
+    }
+
     public void punish(int[][] bitMap, String symbol) throws Exception {
         findBySymbol(symbol).prise(bitMap);
 //        findOther(symbol).forEach(p -> p.punish(bitMap));
@@ -50,10 +62,9 @@ public class Neiro implements Serializable {
         Comparator<Pair<String, Double>> comparator = (double1, double2) -> {
                 return double2.getValue().compareTo(double1.getValue());
         };
-        List<Pair<String, Double>> predicts = perceptrons.stream().map(
+        return perceptrons.stream().map(
                 perceptron -> new Pair<>(perceptron.getPerceptronSymbol(), perceptron.getSum(bitMap, referenceSum)))
                 .sorted(comparator).toList();
-        return predicts;
     }
 
     public void print() {

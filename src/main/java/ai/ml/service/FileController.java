@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Service
@@ -18,15 +19,21 @@ public class FileController {
 
     Logger logger = LoggerFactory.getLogger(FileController.class);
 
-    private static final String fileSystemDelimiter = "\\";
+    public static final String fileSystemDelimiter = "\\";
 
-    private static final String basicWay = "E:\\AI\\";
+    public static final String basicWay = "E:\\AI\\";
 
-    private static final String neiroFile = basicWay + "neiro.ser";
+    public static final String neiroFile = basicWay + "neiro.ser";
 
-    private static final String way = basicWay + "DataSet\\";
-    private static final String cache = basicWay + "Cache\\";
+    public static final String dataset = basicWay + "DataSet\\";
+    public static final String cache = basicWay + "Cache\\";
 
+
+
+    public Neiro loadNeiro() throws Exception {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(neiroFile));
+        return (Neiro) ois.readObject();
+    }
 
     public void saveNeiro(Neiro neiro) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(neiroFile));) {
@@ -36,17 +43,42 @@ public class FileController {
         }
     }
 
-    public Neiro loadNeiro() throws Exception {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(neiroFile));
-        return (Neiro) ois.readObject();
+    public String[] getFileNames(String dirName) throws Exception {
+        return Arrays.stream(Objects.requireNonNull(new File(dataset + dirName).list()))
+                .map(name -> (dataset + dirName + fileSystemDelimiter + name)).toArray(String[]::new);
+    }
+
+    public Image loadImage(File imageFile) throws IOException {
+        BufferedImage image = ImageIO.read(imageFile);
+        return SwingFXUtils.toFXImage(image, null);
+    }
+
+    public Image prepareImageFoNeiro(Image image) throws Exception {
+        File file = new File(cache + "cache.png");
+        return save(file, image);
+    }
+
+    public void saveImage(Image image, String ... fileWaySlices) throws Exception {
+        String fileWay = toOneWay(fileWaySlices);
+        File file = new File(dataset + fileWay + filesCount(fileWay) + ".png");
+        save(file, image);
+    }
+
+
+    private String toOneWay(String ... fileWay) {
+        StringBuilder oneWay = new StringBuilder();
+        for(String slice : fileWay){
+            oneWay.append(slice).append(fileSystemDelimiter);
+        }
+        return oneWay.toString();
     }
 
 
     public int filesCount(String fileWay) throws Exception {
         try {
-            return Objects.requireNonNull(new File(way + fileWay).list()).length;
+            return Objects.requireNonNull(new File(dataset + fileWay).list()).length;
         } catch (Exception e) {
-            if (new File(way + fileWay).mkdirs()) {
+            if (new File(dataset + fileWay).mkdirs()) {
                 return 0;
             }
         }
@@ -67,26 +99,6 @@ public class FileController {
             System.out.println(ex.getMessage());
             throw ex;
         }
-    }
-
-    public Image prepareImageFoNeiro(Image image) throws Exception {
-        File file = new File(cache + "cache.png");
-        return save(file, image);
-    }
-
-    public Image saveImage(Image image, String ... fileWaySlices) throws Exception {
-        String fileWay = toOneWay(fileWaySlices);
-        File file = new File(way + fileWay + filesCount(fileWay) + ".png");
-        return save(file, image);
-    }
-
-
-    private String toOneWay(String ... fileWay) {
-        StringBuilder oneWay = new StringBuilder();
-        for(String slice : fileWay){
-            oneWay.append(slice).append(fileSystemDelimiter);
-        }
-        return oneWay.toString();
     }
 
     private Image toPerceptronResolution(Image image) {
