@@ -37,31 +37,31 @@ public class Neiro implements Serializable {
                 .findAny().orElseThrow(() -> new Exception("No such perceptron exist!"));
     }
 
-    public List<Perceptron> findOther(String symbol) throws Exception {
+    public List<Perceptron> findOther(String symbol) {
         return perceptrons.stream()
                 .filter(p -> !p.equalsBySymbol(symbol)).toList();
     }
 
-    public void learn(int[][] bitMap, double referenceSum, String symbol) throws Exception {
-        Pair<String, Double> predict = getPredicts(bitMap, referenceSum).stream()
-                .findFirst().orElseThrow(() -> new Exception("Predicts is empty!"));
-        logger.info("perceptron -> {} | symbol -> {}", predict.getKey(), symbol);
-        if (!predict.getKey().equals(symbol)) {
-            punish(bitMap, symbol);
-        } else if (predict.getValue() < Consts.threshold) {
-            punish(bitMap, symbol);
+    public void learn(Perceptron perceptron, int[][] bitMap, double referenceSum, String symbol) {
+        double predict = perceptron.getSum(bitMap, referenceSum);
+        if (perceptron.equalsBySymbol(symbol)) {
+            perceptron.prise(bitMap, predict);
+        } else {
+            perceptron.punish(bitMap, predict);
         }
+
+    }
+
+    public void prise(int[][] bitMap, String symbol) throws Exception {
+        findBySymbol(symbol).prise(bitMap);
     }
 
     public void punish(int[][] bitMap, String symbol) throws Exception {
-        findBySymbol(symbol).prise(bitMap);
-//        findOther(symbol).forEach(p -> p.punish(bitMap));
+        findBySymbol(symbol).punish(bitMap);
     }
 
     public List<Pair<String, Double>> getPredicts(int[][] bitMap, double referenceSum) {
-        Comparator<Pair<String, Double>> comparator = (double1, double2) -> {
-                return double2.getValue().compareTo(double1.getValue());
-        };
+        Comparator<Pair<String, Double>> comparator = (double1, double2) -> double2.getValue().compareTo(double1.getValue());
         return perceptrons.stream().map(
                 perceptron -> new Pair<>(perceptron.getPerceptronSymbol(), perceptron.getSum(bitMap, referenceSum)))
                 .sorted(comparator).toList();

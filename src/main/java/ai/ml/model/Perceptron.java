@@ -4,13 +4,10 @@ import ai.ml.util.Consts;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 public class Perceptron implements Serializable {
     private final String perceptronSymbol;
@@ -18,8 +15,8 @@ public class Perceptron implements Serializable {
 
     public double getSum(int[][] bitMap, double referenceSum) {
         double sum = 0.0;
-        for (int x = 0; x < pixelWeight.length; x++) {
-            for (int y = 0; y < pixelWeight[0].length; y++) {
+        for (int y = 0; y < pixelWeight[0].length; y++) {
+            for (int x = 0; x < pixelWeight.length; x++) {
                 sum += bitMap[x][y] * pixelWeight[x][y];
             }
         }
@@ -30,22 +27,30 @@ public class Perceptron implements Serializable {
         return perceptronSymbol.equals(symbol);
     }
 
+    public void punish(int[][] bitMap, double predict) {
+        learn(bitMap, Consts.wrong_threshold - predict);
+    }
+
+    public void prise(int[][] bitMap, double predict) {
+        learn(bitMap, Consts.recognize_threshold - predict);
+    }
+
     public void punish(int[][] bitMap) {
-        for (int x = 0; x < pixelWeight.length; x++) {
-            for (int y = 0; y < pixelWeight[0].length; y++) {
-                pixelWeight[x][y] += bitMap[x][y] == 0 ? Consts.step : -Consts.step;
-                pixelWeight[x][y] = Math.min(pixelWeight[x][y], 1.0);
-                pixelWeight[x][y] = Math.max(pixelWeight[x][y], 0.0);
-            }
-        }
+        learn(bitMap, -Consts.step);
     }
 
     public void prise(int[][] bitMap) {
-        for (int x = 0; x < pixelWeight.length; x++) {
-            for (int y = 0; y < pixelWeight[0].length; y++) {
-                pixelWeight[x][y] += bitMap[x][y] == 0 ? -Consts.step : Consts.step;
-                pixelWeight[x][y] = Math.min(pixelWeight[x][y], 1.0);
-                pixelWeight[x][y] = Math.max(pixelWeight[x][y], 0.0);
+        learn(bitMap, Consts.step);
+    }
+
+    public void learn(int[][] bitmap, double step) {
+        for (int y = 0; y < pixelWeight[0].length; y++) {
+            for (int x = 0; x < pixelWeight.length; x++) {
+                if (bitmap[x][y] == 1) {
+                    pixelWeight[x][y] += Consts.rate *  step;
+                    pixelWeight[x][y] = Math.min(pixelWeight[x][y], Consts.maxWeight);
+                    pixelWeight[x][y] = Math.max(pixelWeight[x][y], Consts.minWeight);
+                }
             }
         }
     }
@@ -65,14 +70,26 @@ public class Perceptron implements Serializable {
 
     @Override
     public String toString() {
-        String res = perceptronSymbol + " {";
+
+        StringBuilder res = new StringBuilder(perceptronSymbol + " {\n\t");
+        for (int y = 0; y < pixelWeight[0].length; y++) {
+            res.append(y).append("\t");
+        }
         for (int x = 0; x < pixelWeight.length; x++) {
+            res.append("\n").append(x).append("\t");
             for (int y = 0; y < pixelWeight[0].length; y++) {
-                res += "({" + x + ":" + y + "} = " + pixelWeight[x][y] + ") ";
+                res.append("(").append(format(x,y)).append(")\t");
             }
         }
-        res += "}";
-        return  res;
+        res.append("}");
+        return res.toString();
+    }
+
+    private String format(int x, int y) {
+        if(pixelWeight[x][y] >= 0) {
+            return String.format("+%.3f", pixelWeight[x][y]);
+        }
+        return String.format("%.3f", pixelWeight[x][y]);
     }
 
 }

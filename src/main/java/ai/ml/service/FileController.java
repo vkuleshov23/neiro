@@ -19,24 +19,16 @@ public class FileController {
 
     Logger logger = LoggerFactory.getLogger(FileController.class);
 
-    public static final String fileSystemDelimiter = "\\";
-
-    public static final String basicWay = "E:\\AI\\";
-
-    public static final String neiroFile = basicWay + "neiro.ser";
-
-    public static final String dataset = basicWay + "DataSet\\";
-    public static final String cache = basicWay + "Cache\\";
 
 
 
     public Neiro loadNeiro() throws Exception {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(neiroFile));
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(Consts.neiroFile));
         return (Neiro) ois.readObject();
     }
 
     public void saveNeiro(Neiro neiro) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(neiroFile));) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(Consts.neiroFile));) {
             oos.writeObject(neiro);
         } catch (IOException e) {
            logger.error(e.getMessage());
@@ -44,8 +36,8 @@ public class FileController {
     }
 
     public String[] getFileNames(String dirName) throws Exception {
-        return Arrays.stream(Objects.requireNonNull(new File(dataset + dirName).list()))
-                .map(name -> (dataset + dirName + fileSystemDelimiter + name)).toArray(String[]::new);
+        return Arrays.stream(Objects.requireNonNull(new File(Consts.dataset + dirName).list()))
+                .map(name -> (Consts.dataset + dirName + Consts.fileSystemDelimiter + name)).toArray(String[]::new);
     }
 
     public Image loadImage(File imageFile) throws IOException {
@@ -54,13 +46,18 @@ public class FileController {
     }
 
     public Image prepareImageFoNeiro(Image image) throws Exception {
-        File file = new File(cache + "cache.png");
+        File file = new File(Consts.cache + "cache.png");
+        return save(file, image);
+    }
+
+    public Image prepareImageFoNeiro(Image image, String symbol) throws Exception {
+        File file = new File(Consts.cache + "cache" + symbol + ".png");
         return save(file, image);
     }
 
     public void saveImage(Image image, String ... fileWaySlices) throws Exception {
         String fileWay = toOneWay(fileWaySlices);
-        File file = new File(dataset + fileWay + filesCount(fileWay) + ".png");
+        File file = new File(Consts.dataset + fileWay + filesCount(fileWay) + ".png");
         save(file, image);
     }
 
@@ -68,7 +65,7 @@ public class FileController {
     private String toOneWay(String ... fileWay) {
         StringBuilder oneWay = new StringBuilder();
         for(String slice : fileWay){
-            oneWay.append(slice).append(fileSystemDelimiter);
+            oneWay.append(slice).append(Consts.fileSystemDelimiter);
         }
         return oneWay.toString();
     }
@@ -76,9 +73,9 @@ public class FileController {
 
     public int filesCount(String fileWay) throws Exception {
         try {
-            return Objects.requireNonNull(new File(dataset + fileWay).list()).length;
+            return Objects.requireNonNull(new File(Consts.dataset + fileWay).list()).length;
         } catch (Exception e) {
-            if (new File(dataset + fileWay).mkdirs()) {
+            if (new File(Consts.dataset + fileWay).mkdirs()) {
                 return 0;
             }
         }

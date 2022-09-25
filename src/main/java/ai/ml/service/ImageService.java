@@ -1,6 +1,7 @@
 package ai.ml.service;
 
 import ai.ml.util.Consts;
+import ai.ml.util.Randomizer;
 import javafx.scene.image.*;
 import javafx.scene.paint.Color;
 import lombok.RequiredArgsConstructor;
@@ -24,37 +25,13 @@ public class ImageService {
         this.symbol = symbol;
     }
 
-    public void saveImage(Image image) throws Exception{
+    public void saveImage(Image image) throws Exception {
         this.fileController.saveImage(image, symbol);
     }
 
-    public void learForSymbols(Neiro neiro) {
-        for (String patternSymbol : Consts.symbols) {
-            logger.debug("symbol: {}", patternSymbol);
-            learForSymbol(neiro, patternSymbol);
-        }
-    }
-
-    private void learForSymbol(Neiro neiro, String patternSymbol) {
-        try {
-            String[] imageNames = fileController.getFileNames(patternSymbol);
-            for (String imageName : imageNames) {
-                this.learForImage(neiro, imageName, patternSymbol);
-            }
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-        }
-    }
-
-    private void learForImage(Neiro neiro, String imageName, String patternSymbol) {
-        logger.debug("image -> {}", imageName);
-        try {
-            Image image = fileController.loadImage(new File(imageName));
-            int[][] bitMap = this.imageForNeiro(image);
-            neiro.learn(bitMap, getPixelSum(bitMap), patternSymbol);
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-        }
+    public String getRandomImage(String patternSymbol) throws Exception {
+        String[] imageNames = fileController.getFileNames(patternSymbol);
+       return Randomizer.randString(imageNames);
     }
 
     public double getPixelSum(int[][] bitMapImage) {
@@ -69,13 +46,19 @@ public class ImageService {
 
     public int[][] imageForNeiro(Image image) throws Exception {
         image = this.fileController.prepareImageFoNeiro(image);
-        int width = (int)image.getWidth();
-        int height = (int)image.getHeight();
-        int[][] bitMap = getBitMap(width, height, image.getPixelReader());
-        return bitMap;
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        return getBitMap(width, height, image.getPixelReader());
     }
 
-    int[][] getBitMap(int width, int height, PixelReader pixelReader) throws Exception{
+    public int[][] imageForNeiro(Image image, String symbol) throws Exception {
+        image = this.fileController.prepareImageFoNeiro(image, symbol);
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        return getBitMap(width, height, image.getPixelReader());
+    }
+
+    int[][] getBitMap(int width, int height, PixelReader pixelReader) throws Exception {
         int[][] bitImage = new int[Consts.xSize][Consts.ySize];
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {

@@ -21,7 +21,6 @@ public class FxApplication extends Application {
         this.applicationContext = new SpringApplicationBuilder()
                 .sources(AiMlApplication.class)
                 .run(args);
-
     }
 
     @Override

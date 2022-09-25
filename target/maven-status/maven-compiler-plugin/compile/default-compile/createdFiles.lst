@@ -1,12 +1,14 @@
 ai\ml\service\ImageService.class
-ai\ml\service\DataSetReader.class
 ai\ml\service\FileController.class
 ai\ml\util\NewNeiroCreator.class
 ai\ml\util\WriteSaveProgress.class
 ai\ml\model\Perceptron.class
 ai\ml\util\Consts.class
+ai\ml\event\LearnEvent.class
 ai\ml\service\Neiro.class
 ai\ml\service\WritingPixels.class
 ai\ml\AiMlApplication.class
+ai\ml\util\Randomizer.class
+ai\ml\service\NeiroLearning.class
 ai\ml\FxApplication.class
 ai\ml\controller\MainSceneController.class

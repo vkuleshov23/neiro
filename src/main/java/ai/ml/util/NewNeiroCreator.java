@@ -20,7 +20,8 @@ public class NewNeiroCreator {
         double[][] pixelsWeight = new double[Consts.xSize][Consts.ySize];
         for (Integer x = 0; x < Consts.xSize; x++) {
             for (Integer y = 0; y < Consts.ySize; y++) {
-                pixelsWeight[x][y] = Math.random();
+//                pixelsWeight[x][y] = Randomizer.randInt();
+                pixelsWeight[x][y] = Consts.minWeight;
             }
         }
         return pixelsWeight;

@@ -1,8 +1,11 @@
 package ai.ml.controller;
 
+import ai.ml.event.LearnEvent;
 import ai.ml.service.ImageService;
 import ai.ml.service.Neiro;
+import ai.ml.service.NeiroLearning;
 import ai.ml.service.WritingPixels;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -10,12 +13,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -35,6 +38,10 @@ public class MainSceneController {
     private final Neiro neiro;
     private final WritingPixels writingPixels;
     private final ImageService imageService;
+
+    private final NeiroLearning neiroLearning;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     Logger logger = LoggerFactory.getLogger(MainSceneController.class);
 
@@ -72,7 +79,7 @@ public class MainSceneController {
     public void punish(ActionEvent actionEvent) {
         try {
             int[][] bitMap = getBitMap();
-            neiro.punish(bitMap, symbol.getText());
+            neiro.prise(bitMap, symbol.getText());
             neiro.print();
             predict(bitMap);
             logger.info("PUNISHED");
@@ -85,7 +92,7 @@ public class MainSceneController {
         double referenceSum = imageService.getPixelSum(bitMap);
         List<Pair<String, Double>> predicts = neiro.getPredicts(bitMap, referenceSum);
         resPane.clear();
-        predicts.forEach(p -> resPane.appendText(p.getKey() + " = " + p.getValue() + "\n"));
+        predicts.forEach(p -> resPane.appendText(p.getKey() + " = " + String.format("%.5f",p.getValue()) + "\n"));
     }
 
     private int[][] getBitMap() throws Exception {
@@ -98,6 +105,8 @@ public class MainSceneController {
     }
 
     public void learn(ActionEvent actionEvent) {
-        imageService.learForSymbols(this.neiro);
+        eventPublisher.publishEvent(new LearnEvent(this.neiro));
+        logger.info("LEARNED");
+
     }
 }
