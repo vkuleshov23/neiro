@@ -2,7 +2,7 @@ package ai.ml.util;
 
 public class Consts {
 
-    public static final Integer selectionSize = 10_00;
+    public static final Integer selectionSize = 1_000;
     public static final Integer xSize = 32;
     public static final Integer ySize = 32;
 
